@@ -1,4 +1,5 @@
 var PRICE = 9.99;
+var LOAD_NUM = 10;
 
 new Vue({
     el: '#app',
@@ -6,6 +7,8 @@ new Vue({
         total: 0,
         items: [],
         cart: [],
+        results: [],
+        resultsNumber: 0,
         newsearch: 'anime',
         lastsearch: '',
         loading: false,
@@ -13,16 +16,38 @@ new Vue({
     },
     mounted: function () {
         this.onSubmit();
+
+        var vueInstance = this;
+        var elem = document.getElementById('product-list-bottom');
+        var watcher = scrollMonitor.create(elem);
+        watcher.enterViewport(function () {
+            vueInstance.appendItems();
+        });
+    },
+    computed: {
+        noMoreItems: function () {
+            return this.items.length === this.results.length && this.results.length > 0
+        }
     },
     methods: {
+        appendItems: function () {
+            if (this.items.length < this.results.length) {
+                var append = this.results.splice(this.items.length, this.items.length + LOAD_NUM);
+                this.items = this.items.concat(append);
+            }
+        },
         onSubmit: function () {
-            this.items = [];
-            this.loading = true;
-            this.$http.get('/search/'.concat(this.newsearch)).then(function (res) {
-                this.loading = false;
-                this.lastsearch = this.newsearch;
-                this.items = res.data;
-            });
+            if (this.newsearch.length) {
+                this.items = [];
+                this.loading = true;
+                this.$http.get('/search/'.concat(this.newsearch)).then(function (res) {
+                    this.loading = false;
+                    this.lastsearch = this.newsearch;
+                    this.results = res.data;
+                    this.resultsNumber = res.data.length;
+                    this.appendItems();
+                });
+            }
         },
         addItem: function (index) {
             this.total += PRICE;
@@ -68,3 +93,5 @@ new Vue({
         }
     }
 });
+
+

@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <div class="header">
             <h1>Vue.js Poster Store</h1>
             <form class="searchbar" v-on:submit.prevent="onSubmit">
@@ -30,7 +30,7 @@
                     Loading....
                 </div>
                 <div class="search-results" v-else>
-                    Found {{ items.length}} results for search term {{ lastsearch }}
+                    Found {{ resultsNumber }} results for search term {{ lastsearch }}
                 </div>
                 <div class="product" v-for="(item, index) in items">
                     <div>
@@ -45,6 +45,9 @@
                         </p>
                         <button v-on:click="addItem(index)" class="add-to-cart btn">Add to cart</button>
                     </div>
+                </div>
+                <div id="product-list-bottom">
+                    <div v-if="noMoreItems">No more items.</div>
                 </div>
             </div>
             <div class="cart">
@@ -73,6 +76,7 @@
     <script src="/reload/reload.js"></script>
     <script src="node_modules/vue/dist/vue.js"></script>
     <script src="node_modules/vue-resource/dist/vue-resource.js"></script>
+    <script src="node_modules/scrollmonitor/scrollMonitor.js"></script>
     <script type="text/javascript" src="public/script.js"></script>
 
 </body>
